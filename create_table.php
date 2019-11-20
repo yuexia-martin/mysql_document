@@ -57,7 +57,7 @@ if(!empty($_REQUEST['username'])){
 if(!empty($_REQUEST['password'])){
 	$password = base64_decode($_REQUEST['password']);
 }else{
-	$password='liexin_credit#zsyM';
+	$password='';
 }
 
 
