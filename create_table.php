@@ -5,17 +5,36 @@
 
 function jump(data){
 	// console.log(data)
-	  var inputValue = document.getElementById("input_db").value;
-      console.log(inputValue);
+	  var dbname = document.getElementById("input_db").value;
+      console.log(dbname);
 
-      window.location.href="create_table.php?dbname="+inputValue; 
+      var host = document.getElementById("host").value;
+      console.log(host);
+
+      var username = document.getElementById("username").value;
+      console.log(username);
+
+      var password = window.btoa(document.getElementById("password").value);
+      console.log(password);
+
+      var url = "create_table.php?dbname="+dbname+'&host='+host+'&username='+username+'&password='+password;
+
+      window.location.href=url; 
 }
 
 
 </script>
 
 <div>
-		请输入库名: <input type="text" id="input_db" name="fname" />  <button id="create_table" onclick="jump(this)"  class='create_table'>生成数据库报表</button>
+		请输入主机地址: <input type="text" id="host" name="fname" value='<?php echo $_REQUEST['host']; ?>' /> <br/>
+		请输入mysql账户: <input type="text" id="username" name="fname" value='<?php echo $_REQUEST['username']; ?>'/> <br/>
+		请输入mysql密码: <input type="text" id="password" name="fname" value='<?php echo base64_decode($_REQUEST['password']); ?>' /> <br/>
+
+		请输入库名: <input type="text" id="input_db" name="fname" value='<?php echo $_REQUEST['dbname'] ?>' /> 
+
+
+
+		 <button id="create_table" onclick="jump(this)"  class='create_table'>生成数据库报表</button>
 </div>
 
 
@@ -23,17 +42,33 @@ function jump(data){
 
 <?php 
 
-$host='192.168.2.232';
+if(!empty($_REQUEST['host'])){
+	$host = $_REQUEST['host'];
+}else{
+	$host='192.168.2.232';
+}
 
-$user='liexin_credit';
+if(!empty($_REQUEST['username'])){
+	$user = $_REQUEST['username'];
+}else{
+	$user='liexin_credit';
+}
 
-$password='liexin_credit#zsyM';
+if(!empty($_REQUEST['password'])){
+	$password = base64_decode($_REQUEST['password']);
+}else{
+	$password='liexin_credit#zsyM';
+}
+
+
+
 
 if(!empty($_REQUEST['dbname'])){
 	$dbName=  str_replace( "'", "", $_REQUEST['dbname']);
 }else{
 	$dbName='liexin_credit';
 }
+
 
 
 
@@ -85,8 +120,15 @@ function query($link,$sql){
 	根据建表语句 创建表文档
 */
 function creata_table($sql){
+
+	$is_windows =  strtoupper(substr(PHP_OS,0,3))==='WIN'?true:false; 
+
+	if($is_windows){
+		$arr = explode('\n', $sql);
+	}else{
+		$arr = explode(PHP_EOL, $sql);
+	}
 	
-	$arr = explode('\n', $sql);
 
 	//获取数据库表名
 	preg_match('/CREATE TABLE `([a-zA-Z0-9_]{1,})`/',$arr[0],$table_name);
@@ -167,7 +209,7 @@ function get_field_name($str){
 	获取字段类型
 */
 function get_field_type($str){
-	preg_match('/`([a-zA-Z0-9_]{1,})` ([a-zA-Z0-9_\(\)]{1,})/',$str,$result);
+	preg_match("/`([a-zA-Z0-9_]{1,})` ([a-zA-Z0-9_\(\)'\,]{1,})/",$str,$result);
 	return $result[2];
 }
 
