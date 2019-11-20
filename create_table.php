@@ -86,7 +86,7 @@ function query($link,$sql){
 */
 function creata_table($sql){
 	
-	$arr = explode(PHP_EOL, $sql);
+	$arr = explode('\n', $sql);
 
 	//获取数据库表名
 	preg_match('/CREATE TABLE `([a-zA-Z0-9_]{1,})`/',$arr[0],$table_name);
